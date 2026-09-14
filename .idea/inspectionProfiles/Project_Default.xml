@@ -1,0 +1,48 @@
+<component name="InspectionProjectProfileManager">
+  <profile version="1.0">
+    <option name="myName" value="Project Default" />
+    <inspection_tool class="PyPackageRequirementsInspection" enabled="false" level="WARNING" enabled_by_default="false">
+      <option name="ignoredPackages">
+        <list>
+          <option value="asgiref" />
+          <option value="contourpy" />
+          <option value="cycler" />
+          <option value="Django" />
+          <option value="django-debug-toolbar" />
+          <option value="django-extensions" />
+          <option value="djangorestframework" />
+          <option value="et_xmlfile" />
+          <option value="filelock" />
+          <option value="fonttools" />
+          <option value="fsspec" />
+          <option value="Jinja2" />
+          <option value="joblib" />
+          <option value="kiwisolver" />
+          <option value="MarkupSafe" />
+          <option value="matplotlib" />
+          <option value="mpmath" />
+          <option value="networkx" />
+          <option value="numpy" />
+          <option value="pandas" />
+          <option value="scikit-learn" />
+          <option value="scipy" />
+          <option value="openpyxl" />
+          <option value="packaging" />
+          <option value="pillow" />
+          <option value="psycopg2" />
+          <option value="pyparsing" />
+          <option value="python-dateutil" />
+          <option value="six" />
+          <option value="sqlparse" />
+          <option value="sympy" />
+          <option value="threadpoolctl" />
+          <option value="torch" />
+          <option value="torchvision" />
+          <option value="torchaudio" />
+          <option value="typing_extensions" />
+          <option value="tzdata" />
+        </list>
+      </option>
+    </inspection_tool>
+  </profile>
+</component>
