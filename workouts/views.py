@@ -5,9 +5,9 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect
 
 from workouts.forms import RegisterForm
+from workouts.models import Workout
 
 
-# Create your views here.
 def home_view(request):
     if request.user.is_authenticated:
         return render(request, 'workouts/home.html')
@@ -61,3 +61,32 @@ def login_view(request):
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+
+@login_required(login_url='login')
+def workout_list(request):
+    workouts = Workout.objects.filter(
+        user=request.user
+    ).order_by('-id')
+
+    return render(request, 'workouts/workout_list.html', {'workouts': workouts})
+
+@login_required(login_url='login')
+def workout_create(request):
+    if request.method == "POST":
+        name = request.POST['name']
+        date = request.POST.get('date')
+
+        if name=='':
+            counts = len(Workout.objects.filter(user=request.user))
+            name = f'Тренировка №{counts}'
+
+        Workout.objects.create(
+            name=name,
+            date=date,
+            user=request.user
+        )
+
+        return redirect('workout_list')
+
+    return render(request, 'workouts/workout_create.html')

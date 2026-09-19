@@ -1,0 +1,69 @@
+{% extends 'workouts/base.html' %}
+
+{% block title %}Мои тренировки — Workout Tracker{% endblock %}
+
+{% block content %}
+
+<div class="home-container">
+
+    <div class="page-header">
+        <div>
+            <h1>Мои тренировки</h1>
+            <p class="page-subtitle">
+                История твоих тренировок
+            </p>
+        </div>
+
+        <a href="{% url 'workout_create' %}" class="button add-button">
+            + Новая тренировка
+        </a>
+    </div>
+
+
+    {% if workouts %}
+
+        <div class="workout-list">
+
+            {% for workout in workouts %}
+
+                <div class="card workout-card">
+
+                    <div>
+                        <h2>{{ workout.name }}</h2>
+
+                        <p class="workout-date">
+                            {{ workout.date|date:"d.m.Y" }}
+                        </p>
+                    </div>
+
+                    <a href="#" class="details-link">
+                        Открыть →
+                    </a>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="card empty-state">
+
+            <h2>Пока нет тренировок</h2>
+
+            <p>
+                Создай свою первую тренировку, чтобы начать отслеживать прогресс.
+            </p>
+
+            <a href="{% url 'workout_create' %}" class="button empty-button">
+                Создать тренировку
+            </a>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}
