@@ -9,4 +9,5 @@ urlpatterns = [
     path('logout/', logout_view, name='logout'),
     path('workout/', workout_list, name='workout_list'),
     path('workouts/create/', workout_create, name='workout_create'),
+    path('workouts/<int:workout_id>/', workout_detail, name='workout_detail'),
 ]

@@ -2,10 +2,10 @@ from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.http import HttpResponse
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 
 from workouts.forms import RegisterForm
-from workouts.models import Workout
+from workouts.models import Workout, Exercise, WorkoutExercise
 
 
 def home_view(request):
@@ -90,3 +90,36 @@ def workout_create(request):
         return redirect('workout_list')
 
     return render(request, 'workouts/workout_create.html')
+
+@login_required(login_url='login')
+def workout_detail(request, workout_id):
+    workout = get_object_or_404(
+        Workout,
+        id=workout_id,
+        user=request.user
+    )
+    if request.method == "POST":
+        exercise_id = request.POST['exercise']
+
+        if exercise_id:
+            exercise = get_object_or_404(
+                Exercise,
+                id=exercise_id,
+            )
+
+            WorkoutExercise.objects.create(
+                workout=workout,
+                exercise=exercise,
+            )
+
+        return redirect('workout_detail', workout_id=workout_id)
+
+    exercises = Exercise.objects.all().order_by('name')
+
+    workout_exercises = workout.workoutexercise_set.select_related('exercise')
+    return render(
+        request,
+        'workouts/workout_detail.html',
+        {'workout': workout, 'exercises': exercises, 'workout_exercises': workout_exercises}
+    )
+

@@ -1,0 +1,121 @@
+{% extends 'workouts/base.html' %}
+
+{% block title %}
+    {{ workout.name }} — Workout Tracker
+{% endblock %}
+
+{% block content %}
+
+<div class="home-container">
+
+    <!-- Заголовок тренировки -->
+
+    <div class="page-header">
+        <div>
+            <h1>{{ workout.name }}</h1>
+
+            <p class="page-subtitle">
+                {{ workout.date|date:"d.m.Y" }}
+            </p>
+        </div>
+
+        <a href="{% url 'workout_list' %}" class="details-link">
+            ← Все тренировки
+        </a>
+    </div>
+
+
+    <!-- Добавление упражнения -->
+
+    <div class="card add-exercise-card">
+
+        <h2>Добавить упражнение</h2>
+
+        <form method="post">
+
+            {% csrf_token %}
+
+            <div class="exercise-form">
+
+                <select name="exercise" required>
+
+                    <option value="">
+                        Выберите упражнение
+                    </option>
+
+                    {% for exercise in exercises %}
+
+                        <option value="{{ exercise.id }}">
+                            {{ exercise.name }} — {{ exercise.muscle_group }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
+                <button type="submit" class="button">
+                    Добавить
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- Упражнения тренировки -->
+
+    <div class="workout-content">
+
+        <h2>Упражнения</h2>
+
+        {% if workout_exercises %}
+
+            <div class="workout-list">
+
+                {% for workout_exercise in workout_exercises %}
+
+                    <div class="card workout-card">
+
+                        <div>
+
+                            <h2>
+                                {{ workout_exercise.exercise.name }}
+                            </h2>
+
+                            <p class="workout-date">
+                                {{ workout_exercise.exercise.muscle_group }}
+                            </p>
+
+                        </div>
+
+                        <div class="details-link">
+                            Подходы →
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% else %}
+
+            <div class="card empty-state">
+
+                <h2>Упражнений пока нет</h2>
+
+                <p>
+                    Добавьте первое упражнение в эту тренировку.
+                </p>
+
+            </div>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

@@ -36,7 +36,10 @@
                         </p>
                     </div>
 
-                    <a href="#" class="details-link">
+                    <a
+                        href="{% url 'workout_detail' workout.id %}"
+                        class="details-link"
+                    >
                         Открыть →
                     </a>
 
