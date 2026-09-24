@@ -1,3 +1,5 @@
+from urllib.parse import uses_query
+
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
@@ -5,7 +7,7 @@ from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
 from workouts.forms import RegisterForm
-from workouts.models import Workout, Exercise, WorkoutExercise
+from workouts.models import Workout, Exercise, WorkoutExercise, MuscleGroup, Set
 
 
 def home_view(request):
@@ -99,27 +101,98 @@ def workout_detail(request, workout_id):
         user=request.user
     )
     if request.method == "POST":
-        exercise_id = request.POST['exercise']
 
-        if exercise_id:
-            exercise = get_object_or_404(
-                Exercise,
-                id=exercise_id,
-            )
+        if 'exercise' in request.POST:
 
-            WorkoutExercise.objects.create(
-                workout=workout,
-                exercise=exercise,
-            )
+            exercise_id = request.POST['exercise']
+            print(f'************************* {exercise_id} *************************')
+            if exercise_id:
+                exercise = get_object_or_404(
+                    Exercise,
+                    id=exercise_id,
+                )
 
-        return redirect('workout_detail', workout_id=workout_id)
+                WorkoutExercise.objects.create(
+                    workout=workout,
+                    exercise=exercise,
+                )
+
+        if 'workout_exercise_id' in request.POST:
+            workout_exercise_id = request.POST.get('workout_exercise_id')
+            weight = request.POST.get('weight')
+            repetitions = request.POST.get('repetitions')
+            distance = request.POST.get('distance')
+
+            if workout_exercise_id:
+                workout_exercise = get_object_or_404(
+                    WorkoutExercise,
+                    id=workout_exercise_id,
+                    workout=workout
+                )
+
+                if (weight and repetitions) or distance:
+                    Set.objects.create(
+                        workout_exercise=workout_exercise,
+                        weight=weight or None,
+                        repetitions=repetitions or None,
+                        distance=distance or None
+                    )
+
+        return redirect(
+            'workout_detail',
+            workout_id=workout.id
+        )
+
+    muscle_group = MuscleGroup.objects.all().order_by('name')
 
     exercises = Exercise.objects.all().order_by('name')
 
-    workout_exercises = workout.workoutexercise_set.select_related('exercise')
+    workout_exercises = workout.workoutexercise_set.select_related(
+        'exercise',
+        'exercise__muscle_group'
+    )
     return render(
         request,
         'workouts/workout_detail.html',
-        {'workout': workout, 'exercises': exercises, 'workout_exercises': workout_exercises}
+        {'workout': workout, 'exercises': exercises, 'workout_exercises': workout_exercises, 'muscle_group': muscle_group}
     )
 
+@login_required(login_url='login')
+def workout_delete(request, workout_id):
+    workout = get_object_or_404(
+        Workout,
+        id = workout_id,
+        user = request.user
+    )
+
+    if request.method == 'POST':
+        workout.delete()
+        return redirect('workout_list')
+
+    return redirect('workout_detail', workout_id=workout.id)
+
+@login_required(login_url='login')
+def workout_exercise_delete(request, workout_exercise_id):
+    workout_exercise = get_object_or_404(
+        WorkoutExercise,
+        id=workout_exercise_id,
+        workout__user=request.user
+    )
+    workout_id = workout_exercise.workout_id
+    if request.method == 'POST':
+        workout_exercise.delete()
+
+    return redirect('workout_detail', workout_id=workout_id)
+
+@login_required(login_url='login')
+def workout_set_delete(request, workout_set_id):
+    workout_set = get_object_or_404(
+        Set,
+        id=workout_set_id,
+        workout_exercise__workout__user=request.user
+    )
+    workout_id = workout_set.workout_exercise.workout_id
+    if request.method == 'POST':
+        workout_set.delete()
+
+    return redirect('workout_detail', workout_id=workout_id)

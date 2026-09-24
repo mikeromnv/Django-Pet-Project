@@ -24,6 +24,12 @@
         </a>
     </div>
 
+    <form method="post" action="{% url 'workout_delete' workout.id %}">
+        {% csrf_token %}
+        <button type="submit" class="delete_button">
+            Удалить тренировку
+        </button>
+    </form>
 
     <!-- Добавление упражнения -->
 
@@ -31,27 +37,38 @@
 
         <h2>Добавить упражнение</h2>
 
+        <div class="muscle-groups">
+            {% for group in muscle_group %}
+                <button
+                    type="button"
+                    class="muscle-bubble"
+                    data-group-id="{{ group.id }}"
+                >
+                    {{ group.name }}
+                </button>
+            {% endfor %}
+        </div>
+
         <form method="post">
 
             {% csrf_token %}
 
+            <input type="hidden" name="exercise" id="selected-exercise">
+
             <div class="exercise-form">
 
-                <select name="exercise" required>
-
-                    <option value="">
-                        Выберите упражнение
-                    </option>
-
+                <div class="exercise-list">
                     {% for exercise in exercises %}
-
-                        <option value="{{ exercise.id }}">
-                            {{ exercise.name }} — {{ exercise.muscle_group }}
-                        </option>
-
+                        <button
+                            type="button"
+                            class="exercise-bubble"
+                            data-exercise-id="{{ exercise.id }}"
+                            data-group-id="{{ exercise.muscle_group.id }}"
+                        >
+                            {{ exercise.name }}
+                        </button>
                     {% endfor %}
-
-                </select>
+                </div>
 
                 <button type="submit" class="button">
                     Добавить
@@ -63,8 +80,6 @@
 
     </div>
 
-
-    <!-- Упражнения тренировки -->
 
     <div class="workout-content">
 
@@ -78,8 +93,7 @@
 
                     <div class="card workout-card">
 
-                        <div>
-
+                        <div class="exercise-info">
                             <h2>
                                 {{ workout_exercise.exercise.name }}
                             </h2>
@@ -87,14 +101,105 @@
                             <p class="workout-date">
                                 {{ workout_exercise.exercise.muscle_group }}
                             </p>
-
                         </div>
 
-                        <div class="details-link">
-                            Подходы →
+                        <div class="sets-area">
+
+                            <div class="sets-container">
+
+                                {% for set in workout_exercise.set_set.all %}
+
+                                    <div class="set-row saved-set">
+
+                                        <span class="set-number">
+                                            {{ forloop.counter }}
+                                        </span>
+
+                                        <span class="set-value">
+                                            {{ set.weight }} кг
+                                        </span>
+
+                                        <span class="set-value">
+                                            {{ set.repetitions }} повторений
+                                        </span>
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'workout_set_delete' set.id %}"
+                                        >
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="delete_button"
+                                            >
+                                                Удалить
+                                            </button>
+                                        </form>
+
+                                    </div>
+
+                                {% endfor %}
+
+                                <form method="post">
+
+                                    {% csrf_token %}
+
+                                    <div class="set-row">
+
+                                        <span class="set-number">
+                                            {{ workout_exercise.set_set.count|add:"1" }}
+                                        </span>
+
+                                        <input
+                                            type="hidden"
+                                            name="workout_exercise_id"
+                                            value="{{ workout_exercise.id }}"
+                                        >
+
+                                        <input
+                                            type="number"
+                                            name="weight"
+                                            class="set-input weight-input"
+                                            placeholder="Вес, кг"
+                                            step="0.01"
+                                        >
+
+                                        <input
+                                            type="number"
+                                            name="repetitions"
+                                            class="set-input repetitions-input"
+                                            placeholder="Повторения"
+                                        >
+
+                                    </div>
+
+                                    <button
+                                        type="submit"
+                                        class="button save-button"
+                                    >
+                                        Сохранить подход
+                                    </button>
+
+                                </form>
+
+                            </div>
+
                         </div>
 
                     </div>
+
+
+                    <form
+                        method="post"
+                        action="{% url 'workout_exercise_delete' workout_exercise.id %}"
+                    >
+                        {% csrf_token %}
+
+                        <button type="submit" class="delete_button">
+                            Удалить упражнение
+                        </button>
+                    </form>
 
                 {% endfor %}
 
@@ -117,5 +222,74 @@
     </div>
 
 </div>
+<script>
+    const muscles = document.querySelectorAll('.muscle-bubble');
+    const exercises = document.querySelectorAll('.exercise-bubble');
+    const selectedExercise = document.getElementById('selected-exercise');
+
+
+    // Фильтрация по группам мышц
+
+    muscles.forEach(muscle => {
+
+        muscle.addEventListener('click', () => {
+
+            muscle.classList.toggle('active');
+
+            const selectedGroups = Array.from(
+                document.querySelectorAll('.muscle-bubble.active')
+            ).map(muscle => muscle.dataset.groupId);
+
+
+            exercises.forEach(exercise => {
+
+                const exerciseGroupId = exercise.dataset.groupId;
+
+                if (
+                    selectedGroups.length === 0 ||
+                    selectedGroups.includes(exerciseGroupId)
+                ) {
+                    exercise.style.display = 'inline-block';
+                } else {
+                    exercise.style.display = 'none';
+
+                    if (
+                        selectedExercise.value ===
+                        exercise.dataset.exerciseId
+                    ) {
+                        selectedExercise.value = '';
+                        exercise.classList.remove('active');
+                    }
+                }
+
+            });
+
+        });
+
+    });
+
+
+    // Выбор упражнения
+
+    exercises.forEach(exercise => {
+
+        exercise.addEventListener('click', () => {
+
+            // Снимаем выбор с остальных упражнений
+            exercises.forEach(item => {
+                item.classList.remove('active');
+            });
+
+            // Выбираем текущее упражнение
+            exercise.classList.add('active');
+
+            // Записываем его ID в hidden input
+            selectedExercise.value = exercise.dataset.exerciseId;
+
+        });
+
+    });
+</script>
 
 {% endblock %}
+
