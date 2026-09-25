@@ -7,16 +7,23 @@
 <div class="home-container">
 
     <div class="page-header">
+
         <div>
             <h1>Мои тренировки</h1>
+
             <p class="page-subtitle">
                 История твоих тренировок
             </p>
         </div>
 
-        <a href="{% url 'workout_create' %}" class="button add-button">
-            + Новая тренировка
+        <a
+            href="{% url 'workout_create' %}"
+            class="button add-button"
+        >
+            <i data-lucide="plus"></i>
+            Новая тренировка
         </a>
+
     </div>
 
 
@@ -28,19 +35,23 @@
 
                 <div class="card workout-card">
 
-                    <div>
+                    <div class="workout-info">
+
                         <h2>{{ workout.name }}</h2>
 
                         <p class="workout-date">
+                            <i data-lucide="calendar"></i>
                             {{ workout.date|date:"d.m.Y" }}
                         </p>
+
                     </div>
 
                     <a
                         href="{% url 'workout_detail' workout.id %}"
                         class="details-link"
                     >
-                        Открыть →
+                        Открыть
+                        <i data-lucide="arrow-right"></i>
                     </a>
 
                 </div>
@@ -53,13 +64,22 @@
 
         <div class="card empty-state">
 
+            <div class="empty-icon">
+                <i data-lucide="dumbbell"></i>
+            </div>
+
             <h2>Пока нет тренировок</h2>
 
             <p>
-                Создай свою первую тренировку, чтобы начать отслеживать прогресс.
+                Создай свою первую тренировку, чтобы начать
+                отслеживать прогресс.
             </p>
 
-            <a href="{% url 'workout_create' %}" class="button empty-button">
+            <a
+                href="{% url 'workout_create' %}"
+                class="button empty-button"
+            >
+                <i data-lucide="plus"></i>
                 Создать тренировку
             </a>
 

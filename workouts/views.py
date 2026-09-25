@@ -3,6 +3,7 @@ from urllib.parse import uses_query
 from django.contrib.auth import login, authenticate, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
+from django.db.models import Count
 from django.http import HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 
@@ -12,7 +13,43 @@ from workouts.models import Workout, Exercise, WorkoutExercise, MuscleGroup, Set
 
 def home_view(request):
     if request.user.is_authenticated:
-        return render(request, 'workouts/home.html')
+        user = request.user
+
+        workouts_count = Workout.objects.filter(user=user).count()
+        exercises_count = WorkoutExercise.objects.filter(workout__user=user).count()
+        sets_count = Set.objects.filter(workout_exercise__workout__user=user).count()
+
+        last_workout = Workout.objects.filter(
+            user=user
+        ).order_by('-date').first()
+
+        last_workout_date = last_workout.date if last_workout else None
+
+        fav_exercises = WorkoutExercise.objects.filter(workout__user=user).values(
+            'exercise', 'exercise__name'
+        ).annotate(
+            count = Count('exercise')
+        ).order_by('-count')
+
+        for fe in fav_exercises:
+            print(fe)
+        fav_exercise = fav_exercises.first()
+        set_fav_exercise = 0
+        if fav_exercise:
+            set_fav_exercise = Set.objects.filter(
+                workout_exercise__workout__user=user,
+                workout_exercise__exercise=fav_exercise['exercise']
+            ).count()
+
+        context = {
+            'workouts_count': workouts_count,
+            'exercises_count': exercises_count,
+            'sets_count': sets_count,
+            'last_workout_date': last_workout_date,
+            'fav_exercise': fav_exercise,
+            'set_fav_exercise': set_fav_exercise
+        }
+        return render(request, 'workouts/home.html', context)
 
     return redirect('login')
 

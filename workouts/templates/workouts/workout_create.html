@@ -8,11 +8,22 @@
 
     <div class="auth-card">
 
-        <h1>Новая тренировка</h1>
+        <div class="form-title">
 
-        <p class="auth-subtitle">
-            Добавьте информацию о тренировке
-        </p>
+            <div class="form-title-icon">
+                <i data-lucide="dumbbell"></i>
+            </div>
+
+            <div>
+                <h1>Новая тренировка</h1>
+
+                <p class="auth-subtitle">
+                    Добавьте информацию о тренировке
+                </p>
+            </div>
+
+        </div>
+
 
         <form method="post">
 
@@ -41,26 +52,37 @@
                     Дата
                 </label>
 
-                <input
-                    type="date"
-                    id="date"
-                    name="date"
-                    required
-                >
+                <div class="input-with-icon">
+
+                    <i data-lucide="calendar"></i>
+
+                    <input
+                        type="date"
+                        id="date"
+                        name="date"
+                        required
+                    >
+
+                </div>
 
             </div>
 
 
-            <button type="submit" class="button">
+            <button type="submit" class="button create-button">
+                <i data-lucide="check"></i>
                 Создать тренировку
             </button>
 
         </form>
 
+
         <p class="auth-link">
+
             <a href="{% url 'workout_list' %}">
-                ← Вернуться к тренировкам
+                <i data-lucide="arrow-left"></i>
+                Вернуться к тренировкам
             </a>
+
         </p>
 
     </div>

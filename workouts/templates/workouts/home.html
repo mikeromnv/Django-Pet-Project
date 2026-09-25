@@ -16,12 +16,114 @@
         </p>
     </section>
 
-    <div class="card">
-        <h2>Твои тренировки</h2>
+    <div class="card statistics-card">
 
-        <p style="color: #888; margin-top: 10px;">
-            Здесь появятся твои тренировки.
-        </p>
+        <div class="statistics-header">
+            <div class="section-icon">
+                <i data-lucide="chart-no-axes-column"></i>
+            </div>
+
+            <div>
+                <h2>Твоя статистика</h2>
+                <p>Общая информация о твоих тренировках</p>
+            </div>
+        </div>
+
+
+        <div class="statistics-grid">
+
+            <div class="stat-item">
+                <span class="stat-value">{{ workouts_count }}</span>
+                <span class="stat-label">Тренировок</span>
+            </div>
+
+            <div class="stat-item">
+                <span class="stat-value">{{ exercises_count }}</span>
+                <span class="stat-label">Упражнений</span>
+            </div>
+
+            <div class="stat-item">
+                <span class="stat-value">{{ sets_count }}</span>
+                <span class="stat-label">Подходов</span>
+            </div>
+
+        </div>
+
+
+        <div class="statistics-details">
+
+            <div class="stat-detail">
+
+                <div class="stat-detail-icon">
+                    <i data-lucide="calendar"></i>
+                </div>
+
+                <div>
+                    <span class="stat-detail-label">
+                        Последняя тренировка
+                    </span>
+
+                    <span class="stat-detail-value">
+                        {{ last_workout_date }}
+                    </span>
+                </div>
+
+            </div>
+
+
+            {% if fav_exercise %}
+
+                <div class="stat-detail">
+
+                    <div class="stat-detail-icon">
+                        <i data-lucide="trophy"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="stat-detail-label">
+                            Любимое упражнение
+                        </span>
+
+                        <span class="stat-detail-value">
+                            {{ fav_exercise.exercise__name }}
+                        </span>
+
+                        <span class="stat-detail-extra">
+                            {{ fav_exercise.count }} раз ·
+                            {{ set_fav_exercise }} подходов
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% else %}
+
+                <div class="stat-detail">
+
+                    <div class="stat-detail-icon">
+                        <i data-lucide="dumbbell"></i>
+                    </div>
+
+                    <div>
+
+                        <span class="stat-detail-label">
+                            Любимое упражнение
+                        </span>
+
+                        <span class="stat-detail-value">
+                            Пока нет упражнений
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
     </div>
 
 </div>
